@@ -1,0 +1,58 @@
+library(mvtnorm)
+library(glmnet)
+
+# model 1 ----
+set.seed(1234)
+n = 100
+d = 50
+
+rho = 0.2
+Sigma = matrix(0, nrow = d, ncol = d)
+for(i in 1:d) {
+  for(j in 1:d) {
+    Sigma[i,j] = rho^abs(i-j)
+  }
+}
+
+X = rmvnorm(n = n, mean = rep(0, d), sigma = Sigma)
+X = cbind(X[, 1], X)
+X_set = X
+
+beta = c(1, 0, rep(0, d-1))
+epsilon = rnorm(n, mean = 0, sd = 1)
+
+y = X %*% beta + epsilon
+
+(thres = 2 * max(abs(t(X) %*% epsilon)) / n)
+lambda = 0.51
+model = glmnet(X, y, family = "gaussian", alpha = 1, lambda = lambda, intercept = FALSE, standardize = FALSE)
+model$beta
+beta = model$beta
+
+
+# model 2 ----
+X = matrix(c(1, 1, 2, 1, 3, 2, 1, 0), nrow = 2)
+beta1 = c(-1/2, 0, 1/8, 3/8)
+beta2 = c(0, -1/4, 0, 3/4)
+epsilon_hat = c(0.25, -0.45)
+y = c(1.35, 0.15)
+
+# check when n goes to inf
+set.seed(1234)
+nrow = 150
+container = matrix(0, nrow = nrow, ncol = 4)
+coef = rnorm(2 * nrow, sd = 0.6)
+for(i in 1:nrow){
+  container[i,] = coef[i * 1] * X[1,] + coef[i * 2] * X[2,]
+}
+X = container
+epsilon = rnorm(n = nrow, sd = 1.2)
+y = container %*% beta1 + epsilon
+
+(thres = 2 * max(abs(t(X) %*% epsilon)) / nrow)
+lambda = 3
+
+model = glmnet::glmnet(x = X, y = y, family = "gaussian", alpha = 1, 
+                       lambda = lambda, intercept = FALSE, standardize = FALSE)
+model$beta
+

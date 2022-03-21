@@ -1,0 +1,51 @@
+# sample beta_star
+
+library(walkr)
+library(pracma)
+
+source("beta_trans.R")
+
+
+sample_beta_star = function(X, beta, ind, points, method = 'dikin', ntry = 2000, ...) {
+  # check the nullspace
+  Nullspace = nullspace(X)
+  if(is.null(Nullspace)) {
+    stop("The design matrix is of full column rank")
+  }
+  
+  # restrict to the certain columns
+  p = length(beta)
+  X = X[, ind]
+  beta = beta[ind]
+  
+  # sample solutions on equi-set
+  l1norm = sum(abs(beta))
+  A = cbind(X, -X)
+  Rowspace = t(orth(t(A)))
+  b = as.vector(Rowspace %*% beta_slack(beta)) / l1norm
+  
+  for(j in 1:ntry){
+    error_occur = FALSE
+    tryCatch({
+      sampled_points <- walkr(A = Rowspace, b = b + rnorm(n = length(b), sd = 0.00001), points = points, 
+                              method = "dikin", ...)
+    },
+    error = function(e) {error_occur <<- TRUE}
+    )
+    if(error_occur == FALSE) {
+      break
+    }
+  }
+  
+  # deal with samples
+  if(j == ntry & error_occur == TRUE) {
+    print("Either the solution is unique, or the sampler is broken.")
+  }
+  else {
+    beta = t(apply(sampled_points, 2, beta_tight)) * l1norm
+    # convert beta to the full length
+    result = matrix(0, nrow = points, ncol = p)
+    result[, ind] = beta 
+    return(result)
+  }
+}

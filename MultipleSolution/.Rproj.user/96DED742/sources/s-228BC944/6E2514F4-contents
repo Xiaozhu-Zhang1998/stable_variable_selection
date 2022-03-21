@@ -1,0 +1,22 @@
+# Equicorrelation set
+
+equi_index = function(X, y, lambda, beta, tol = 1e-2) {
+  n = nrow(X)
+  z = abs(t(X) %*% (y - X %*% beta) / n)
+  equal = sapply(z, function(j) {
+    all.equal(lambda, j, tolerance = tol)
+  }) 
+  ind = seq_along(z)[equal == "TRUE"]
+  return(ind)
+}
+
+
+gen_inv_index = function(X, beta, tol = 1e-2){
+  b = X %*% beta
+  z = MASS::ginv(X) %*% b
+  equal = sapply(z, function(j) {
+    all.equal(0, j, tolerance = tol)
+  }) 
+  ind = seq_along(z)[equal != "TRUE"]
+  return(ind)
+}

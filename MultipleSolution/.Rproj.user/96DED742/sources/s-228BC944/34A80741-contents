@@ -1,0 +1,11 @@
+# Equicorrelation set
+
+equi_index = function(X, y, lambda, beta, tol = 1e-2) {
+  n = nrow(X)
+  z = abs(t(X) %*% (y - X %*% beta) / n)
+  equal = sapply(z, function(j) {
+    all.equal(lambda, j, tolerance = tol)
+  }) 
+  ind = seq_along(z)[equal == "TRUE"]
+  return(ind)
+}
