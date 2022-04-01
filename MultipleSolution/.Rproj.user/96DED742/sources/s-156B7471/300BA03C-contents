@@ -1,0 +1,9 @@
+# generate "sign_hint" vector
+
+sign_hint = function(orthant) {
+  d = length(orthant)
+  ref = rep(c(1, -1), each = d)
+  rel = rep(orthant, 2)
+  hint = ifelse(ref == rel, ref, 0)
+  return(hint)
+}

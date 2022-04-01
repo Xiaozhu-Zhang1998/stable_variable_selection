@@ -1,0 +1,23 @@
+# Pilot draws
+
+source("beta_trans.R")
+
+pilot_draws = function(X, beta, npoints) {
+  # preparation
+  n = nrow(X)
+  d = ncol(X)
+  A = rbind(cbind(X, -X), rep(1, 2*d))
+  b = rbind(  X %*% beta, sum(abs(beta)))
+  v_par = pracma::pinv(A) %*% b
+  V = pracma::nullspace(A)
+  # draw points
+  P = volesti::Hpolytope(A = -V, b = as.vector(v_par + abs(rnorm(2 * d, sd = 0.0000001))))
+  random_walk = list(
+    walk = 'BiW',
+    walk_length = 100
+  )
+  alpha = volesti::sample_points(P, n = npoints, random_walk = random_walk)
+  x = v_par %*%  matrix(1, nrow = 1, ncol = npoints) + V %*% alpha
+  soln = t(apply(x, 2, beta_tight))
+  return(soln)
+}

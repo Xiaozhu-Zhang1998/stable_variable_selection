@@ -10,7 +10,6 @@ beta_slack = function(beta){
   return( matrix(c(beta_pos, beta_neg), ncol = 1))
 }
 
-
 beta_tight = function(beta){
   len = length(beta)
   return( beta[1:(len/2)] - beta[(len/2 + 1):len] )
