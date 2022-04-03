@@ -2,13 +2,12 @@
 
 source("beta_trans.R")
 
-target_draws = function(X, beta, orthant, x_par, npoints = 10000, walk = 'BiW', walk_length = 100) {
+target_draws = function(X, orthant, x_par, npoints = 10000, walk = 'BiW', walk_length = 100) {
   # preparation
   n = nrow(X)
   d = ncol(X)
   A = rbind(X %*% diag(orthant), 
             rep(1, d))
-  b = A %*% abs(x_par)
   V = pracma::nullspace(A)
   # draw points
   P = volesti::Hpolytope(A = -V, b = as.vector(abs(x_par)))

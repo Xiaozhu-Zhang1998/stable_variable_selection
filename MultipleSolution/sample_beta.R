@@ -3,7 +3,7 @@
 source("beta_trans.R")
 source("equi_corr.R")
 source("find_orthant.R")
-source("find_x_par")
+source("find_x_par.R")
 source("pilot_draws.R")
 source("target_draws.R")
 
