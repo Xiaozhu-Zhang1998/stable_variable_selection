@@ -18,11 +18,9 @@ sample_beta = function(type, X, beta, y = NULL, lambda = NULL, npoints = 1000, w
       stop("y or lambda is missing!")
     }
     ind = equi_index(X, y, lambda, beta, tol = tol)
-  }
-  else if(type == "star") {
+  } else if(type == "star") {
     ind = gen_inv_index(X, beta, tol = tol)
-  }
-  else {
+  } else {
     stop("The type is invalid!")
   }
   
