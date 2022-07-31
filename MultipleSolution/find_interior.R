@@ -15,12 +15,27 @@ find_interior = function(X, beta, tol2) {
   
   A_ = - t(A) %*% V
   b_ = t(A) %*% y_par
-  P = volesti::Hpolytope(A = A_, b = as.vector(b_) + abs(rnorm(2 * d, sd = 1e-10)))
-  random_walk = list(
-    walk = 'BiW',
-    walk_length = 1
-  )
-  alpha = volesti::sample_points(P, n = 100, random_walk = random_walk)
+  
+  flag = FALSE
+  while(TRUE) {
+    # try-catch
+    tryCatch({
+      P = volesti::Hpolytope(A = A_, b = as.vector(b_) + abs(rnorm(2 * d, sd = 1e-10)))
+      random_walk = list(
+        walk = 'BiW',
+        walk_length = 1
+      )
+      alpha = volesti::sample_points(P, n = 100, random_walk = random_walk)
+    },
+    error = function(e) {
+      flag <<- TRUE
+    })
+    # flag
+    if(!flag) {
+      break
+    }
+  }
+  
   y = y_par + V %*% alpha[, 100]
   
   # find the V
