@@ -10,7 +10,7 @@ target_draws = function(X, orthant, x_par, npoints = 10000, walk = 'BiW', walk_l
             rep(1, d))
   V = pracma::nullspace(A)
   # draw points
-  P = volesti::Hpolytope(A = -V, b = as.vector(abs(x_par)))
+  P = volesti::Hpolytope(A = -V, b = as.vector(abs(x_par) ))
   random_walk = list(
     walk = walk,
     walk_length = walk_length

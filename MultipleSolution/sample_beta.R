@@ -4,11 +4,11 @@ source("beta_trans.R")
 source("equi_corr.R")
 source("find_orthant.R")
 source("find_x_par.R")
-source("pilot_draws.R")
+source("find_interior.R")
 source("target_draws.R")
 
-sample_beta = function(type, X, beta, y = NULL, lambda = NULL, npoints = 1000, walk = 'BiW', walk_length = 100, tol = 1e-2) {
-
+sample_beta = function(type, X, beta, y = NULL, lambda = NULL, npoints = 1000, walk = 'BiW', walk_length = 100, tol1 = 1e-2, tol2 = 1e-7) {
+  
   # save the beta
   beta_store = beta
   
@@ -17,9 +17,9 @@ sample_beta = function(type, X, beta, y = NULL, lambda = NULL, npoints = 1000, w
     if(is.null(y) | is.null(lambda)) {
       stop("y or lambda is missing!")
     }
-    ind = equi_index(X, y, lambda, beta, tol = tol)
+    ind = equi_index(X, y, lambda, beta, tol = tol1)
   } else if(type == "star") {
-    ind = gen_inv_index(X, beta, tol = tol)
+    ind = gen_inv_index(X, beta, tol = tol1)
   } else {
     stop("The type is invalid!")
   }
@@ -33,36 +33,21 @@ sample_beta = function(type, X, beta, y = NULL, lambda = NULL, npoints = 1000, w
   X = as.matrix(X[, ind])
   beta = beta[ind]
   
-  unique = FALSE
+  # first find an interior point
+  x_par = find_interior(X, beta, tol2) 
+
+  # find the orthant the interior point
+  orthant = find_orthant(x_par)
   
-  # first make several pilot draws
+  # make "target draws"
   tryCatch({
-    pilot_soln = pilot_draws(X, beta, npoints = 1000)
-    },
+    soln = target_draws(X, orthant, x_par, npoints, walk, walk_length = walk_length)
+  },
   error = function(e) {
-    print("The LASSO solution is unique.")
     soln <<- matrix(1, nrow = npoints, ncol = 1) %*% t(as.matrix(beta))
-    unique <<- TRUE
-    }
-  )
-  
-  if(unique == FALSE) {
-    # find the orthant the draws
-    orthant = find_orthant(pilot_soln)
-    
-    # find a x_par that in the orthant
-    x_par = find_x_par(pilot_soln, orthant)
-    
-    # make "target draws"
-    tryCatch({
-      soln = target_draws(X, orthant, x_par, npoints, walk, walk_length = walk_length)
-    },
-    error = function(e) {
-      soln <<- matrix(1, nrow = npoints, ncol = 1) %*% t(as.matrix(beta))
-      print("The LASSO solution is unique.")
-      }
-    )
+    print("The LASSO solution is unique.")
   }
+  )
   
   # add back the fixed columns
   result = matrix(1, nrow = npoints, ncol = 1) %*% t(as.matrix(beta_store))
@@ -70,4 +55,3 @@ sample_beta = function(type, X, beta, y = NULL, lambda = NULL, npoints = 1000, w
   
   return(result)
 }
-
