@@ -1,8 +1,6 @@
-# Find the interior points
+# facial reduction
 
-source("beta_trans.R")
-
-find_interior = function(X, beta, tol2) {
+facial_reduction = function(X, beta, tol2) {
   # define A and b
   d = ncol(X)
   A = rbind( cbind(X, -X), rep(1, 2 * d))
@@ -38,15 +36,10 @@ find_interior = function(X, beta, tol2) {
   
   y = y_par + V %*% alpha[, 100]
   
-  # find the V
+  # find the FR
   z = t(A) %*% y
   sz = z > tol2
-  V = diag(rep(1, 2 * d))[, !sz]
+  FR = diag(rep(1, 2 * d))[, !sz]
   
-  # find the x_par
-  Pr = t(pracma::orth(A %*% V))
-  v = pracma::pinv(Pr %*% A %*% V) %*% (Pr %*% b)
-  x_par = beta_tight(V %*% v)
-  
-  return(x_par)
+  return(list(A = A, b = b, FR = FR))
 }

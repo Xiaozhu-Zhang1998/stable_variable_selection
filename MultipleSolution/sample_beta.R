@@ -2,9 +2,7 @@
 
 source("beta_trans.R")
 source("equi_corr.R")
-source("find_orthant.R")
-source("find_x_par.R")
-source("find_interior.R")
+source("facial_reduction.R")
 source("target_draws.R")
 
 sample_beta = function(type, X, beta, y = NULL, lambda = NULL, npoints = 1000, walk = 'BiW', walk_length = 100, tol1 = 1e-2, tol2 = 1e-7) {
@@ -33,15 +31,12 @@ sample_beta = function(type, X, beta, y = NULL, lambda = NULL, npoints = 1000, w
   X = as.matrix(X[, ind])
   beta = beta[ind]
   
-  # first find an interior point
-  x_par = find_interior(X, beta, tol2) 
-
-  # find the orthant the interior point
-  orthant = find_orthant(x_par)
+  # do the facial reduction
+  lst = facial_reduction(X, beta, tol2)
   
   # make "target draws"
   tryCatch({
-    soln = target_draws(X, orthant, x_par, npoints, walk, walk_length = walk_length)
+    soln = target_draws(lst$A, lst$FR, beta, npoints, walk, walk_length = walk_length)
   },
   error = function(e) {
     soln <<- matrix(1, nrow = npoints, ncol = 1) %*% t(as.matrix(beta))
