@@ -31,7 +31,7 @@ op_beta_star(X, beta)
 where `X` denotes the design matrix, and `beta` denotes one vector such that `X` * `beta` achieves the desired prediction value. 
 
 
-- Predicted theta: The popular function `glmnet` in the package `glmnet` is able to output one LASSO solution $\hat\theta$ given the design matrix $X$, the response $y$, the tuning parameter $\lambda$, and the parameter $\alpha = 1$.
+- Predicted theta: The popular function `glmnet` in the package `glmnet` is able to output one LASSO solution $\hat\theta\in\hat\Theta$ given the design matrix $X$, the response $y$, the tuning parameter $\lambda$, and the parameter $\alpha = 1$.
 
 
 ## Find other solutions
@@ -52,11 +52,12 @@ sample_beta(type = "hat", X = X, beta = beta, y = y, lambda = lambda, npoints = 
 where `X` is the design matrix, `y` is the response, `lambda` is the tuning parameter, and `beta` is any one ![equation](https://latex.codecogs.com/svg.image?\hat\theta\in\hat\Theta).
 
 
-### MCMC algorithm 
-The MCMC procedure of sampling uniformly on the polytope ![equation](https://latex.codecogs.com/svg.image?\Theta) takes advantage of the function `volesti::sample_points()`, from which the function `sample_beta()` inherits several arguments regarding the MCMC setting such as `walk` and `walk_length`. The default arguments are
+### Other arguments
+
+The MCMC procedure for sampling uniformly on the polytope ![equation](https://latex.codecogs.com/svg.image?\Theta) takes advantage of the function `volesti::sample_points()`, from which the function `sample_beta()` inherits several arguments regarding the MCMC setting such as `walk` and `walk_length`. The default arguments are
 ```
 sample_beta(type, X, beta, y = NULL, lambda = NULL, npoints = 1000, walk = 'BiW', walk_length = 100, tol = 1e-2)
 ```
-The argument `tol` controls the precision of determining the equicorrelation set, which depends on the precision of the given `beta`.
+The argument `tol` controls the precision of determining the equicorrelation set (larger is safer), which depends on the precision of the given `beta`.
 
 
