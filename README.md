@@ -56,8 +56,8 @@ where `X` is the design matrix, `y` is the response, `lambda` is the tuning para
 
 The MCMC procedure for sampling uniformly on the polytope ![equation](https://latex.codecogs.com/svg.image?\Theta) takes advantage of the function `volesti::sample_points()`, from which the function `sample_beta()` inherits several arguments regarding the MCMC setting such as `walk` and `walk_length`. The default arguments are
 ```
-sample_beta(type, X, beta, y = NULL, lambda = NULL, npoints = 1000, walk = 'BiW', walk_length = 100, tol = 1e-2)
+sample_beta(type, X, beta, y = NULL, lambda = NULL, npoints = 1000, walk = 'BiW', walk_length = 100, tol1 = 1e-2, tol2 = 1e-7)
 ```
-The argument `tol` controls the precision of determining the equicorrelation set (larger is safer), which depends on the precision of the given `beta`.
-
+The argument `tol1` controls the precision of determining the equicorrelation set (larger is safer), which depends on the precision of the given `beta`.
+The argument `tol2` sets a threshold a absolute value below which is considered as 0 in the process of facial reduction. 
 
